@@ -1,0 +1,39 @@
+package entity;
+
+import java.time.LocalDateTime;
+
+public class Compromisso {
+	
+	private LocalDateTime data;
+	private String conteudo;
+	
+	public Compromisso() {
+	}
+	
+	public Compromisso(LocalDateTime data, String conteudo) {
+		this.data = data;
+		this.conteudo = conteudo;
+	}
+
+	public LocalDateTime getData() {
+		return data;
+	}
+
+	public void setData(LocalDateTime data) {
+		this.data = data;
+	}
+
+	public String getConteudo() {
+		return conteudo;
+	}
+
+	public void setConteudo(String conteudo) {
+		this.conteudo = conteudo;
+	}
+	
+	@Override
+    public String toString() {
+        return data + " - " + conteudo;
+    }
+
+}
