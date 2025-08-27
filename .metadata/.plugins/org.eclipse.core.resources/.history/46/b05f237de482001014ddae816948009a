@@ -1,0 +1,142 @@
+package Controller;
+
+import java.util.Scanner;
+
+import entity.Agenda;
+import entity.Usuario;
+import service.UsuarioService;
+
+public class ApplicationController {
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+        
+		while (true) {
+	        System.out.println("\n=== AGENDA TELEFÔNICA ===");
+	        System.out.println("1 - Registrar");
+	        System.out.println("2 - Login");
+	        System.out.println("3 - Sair");
+	        System.out.print("Escolha uma opção: ");
+	        
+	        int opcao = scanner.nextInt();
+	        scanner.nextLine();
+
+	        switch (opcao) {
+	            case 1:
+	            	System.out.print("Nome: ");
+	                String nome = scanner.nextLine();
+	                System.out.print("Email: ");
+	                String email = scanner.nextLine();
+	                System.out.print("Senha: ");
+	                String senha = scanner.nextLine();
+	                
+	                if (UsuarioService.registrarUsuario(nome, email, senha)) {
+	                    System.out.println("Usuário registrado com sucesso!");
+	                } else {
+	                    System.out.println("Erro ao registrar usuário. Email já existe.");
+	                }
+	                break;
+	            case 2:
+	            	System.out.print("Email: ");
+	                String email2 = scanner.nextLine();
+	                System.out.print("Senha: ");
+	                String senha2 = scanner.nextLine();
+	                
+	                Usuario usuario = UsuarioService.fazerLogin(email2, senha2);
+	                if (usuario != null) {
+	                    System.out.println("Login realizado com sucesso!");
+	                    menuUsuario(usuario, scanner);
+	                } else {
+	                    System.out.println("Email ou senha incorretos.");
+	                }
+	                break;
+	            case 3:
+	                System.out.println("Saindo...");
+	                scanner.close();
+	                return;
+	            default:
+	                System.out.println("Opção inválida!");
+	        }
+	    }
+    }
+    
+    private static void menuUsuario(Usuario usuario, Scanner scanner) {
+        int opcao;
+        do {
+            System.out.println("\n=== MENU DO USUÁRIO ===");
+            System.out.println("1 - Adicionar contato");
+            System.out.println("2 - Listar contatos");
+            System.out.println("3 - Remover contato");
+            System.out.println("4 - Remover minha conta");
+            System.out.println("5 - Sair");
+            System.out.print("Escolha uma opção: ");
+            
+            opcao = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (opcao) {
+                case 1:
+                    System.out.print("Nome do contato: ");
+                    String nome = scanner.nextLine();
+                    System.out.print("Telefone: ");
+                    String telefone = scanner.nextLine();
+                    
+                    if (UsuarioService.adicionarContato(usuario, nome, telefone)) {
+                        System.out.println("Contato adicionado com sucesso!");
+                    } else {
+                        System.out.println("Erro ao adicionar contato.");
+                    }
+                    break;
+                    
+                case 2:
+                    System.out.println("\n=== MEUS CONTATOS ===");
+                    for (Agenda agenda : usuario.getAgenda()) {
+                        System.out.println(agenda.getNome() + " - " + agenda.getTelefone());
+                    }
+                    break;
+                    
+                case 3:
+                    System.out.println("\n=== REMOVER CONTATO ===");
+                    for (int i = 0; i < usuario.getAgenda().size(); i++) {
+                    	Agenda agenda = usuario.getAgenda().get(i);
+                        System.out.println((i+1) + " - " + agenda.getNome() + " - " + agenda.getTelefone());
+                    }
+                    System.out.print("Escolha o número do contato a remover: ");
+                    int index = scanner.nextInt();
+                    scanner.nextLine();
+                    
+                    if (index > 0 && index <= usuario.getAgenda().size()) {
+                    	Agenda agenda = usuario.getAgenda().get(index-1);
+                        if (UsuarioService.removerContato(usuario, agenda)) {
+                            System.out.println("Contato removido com sucesso!");
+                        } else {
+                            System.out.println("Erro ao remover contato.");
+                        }
+                    } else {
+                        System.out.println("Número inválido.");
+                    }
+                    break;
+                    
+                case 4:
+                    System.out.print("Tem certeza que deseja remover sua conta? (s/n): ");
+                    String confirmacao = scanner.nextLine();
+                    if (confirmacao.equalsIgnoreCase("s")) {
+                        if (UsuarioService.removerUsuario(usuario)) {
+                            System.out.println("Conta removida com sucesso!");
+                            return;
+                        } else {
+                            System.out.println("Erro ao remover conta.");
+                        }
+                    }
+                    break;
+                    
+                case 5:
+                    System.out.println("Saindo...");
+                    break;
+                    
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (opcao != 5);
+    }
+}
+

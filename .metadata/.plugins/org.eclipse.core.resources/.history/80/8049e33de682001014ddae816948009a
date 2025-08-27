@@ -1,0 +1,117 @@
+package service;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import entity.Agenda;
+import entity.Usuario;
+
+public class ArquivoService {
+	
+	private static final String ARQUIVO_USUARIOS = "contatos/usuarios.txt";
+    private static final String PASTA_CONTATOS = "contatos/";
+	
+    public static void salvarUsuario(Usuario usuario) throws IOException {
+        if (usuario.getEmail() == null || usuario.getEmail().isEmpty()) {
+            throw new IOException("Email do usuário inválido");
+        }
+        
+        new File(PASTA_CONTATOS).mkdirs();
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO_USUARIOS, true))) {
+        	writer.write(usuario.getNome() + ";" + usuario.getEmail() + ";" + usuario.getSenha());
+            writer.newLine();
+        }
+    }
+	
+    public static List<Usuario> carregarUsuarios() throws IOException {
+        List<Usuario> usuarios = new ArrayList<>();
+        File file = new File(ARQUIVO_USUARIOS);
+        
+        if (!file.exists()) {
+            return usuarios;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO_USUARIOS))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+            	
+                if (linha.trim().isEmpty()) continue;
+                
+                String[] partes = linha.split(";");
+                if (partes.length == 3) {
+                    // Remove espaços em branco extras
+                    Usuario usuario = new Usuario(
+                        partes[0].trim(), 
+                        partes[1].trim(), 
+                        partes[2].trim()
+                    );
+                    usuarios.add(usuario);
+                }
+            }
+        }
+        return usuarios;
+    }
+    
+    public static void salvarContatos(Usuario usuario) throws IOException {
+        String nomeArquivo = PASTA_CONTATOS + usuario.getEmail().replaceAll("[^a-zA-Z0-9]", "_") + ".txt";
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeArquivo))) {
+            for (Agenda agenda : usuario.getAgenda()) {
+                writer.write(agenda.toString());
+                writer.newLine();
+            }
+        }
+    }
+    
+    public static List<Agenda> carregarContatos(Usuario usuario) throws IOException {
+        List<Agenda> contatos = new ArrayList<>();
+        String nomeArquivo = PASTA_CONTATOS + usuario.getEmail().replaceAll("[^a-zA-Z0-9]", "_") + ".txt";
+        File file = new File(nomeArquivo);
+        
+        if (!file.exists()) return contatos;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(nomeArquivo))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] partes = linha.split(";");
+                if (partes.length == 2) {
+                	Agenda contato = new Agenda(partes[0], partes[1]);
+                    contatos.add(contato);
+                }
+            }
+        }
+        return contatos;
+    }
+    
+    public static void removerUsuario(Usuario usuario) throws IOException {
+        
+        List<Usuario> usuarios = carregarUsuarios();
+        List<Usuario> novosUsuarios = new ArrayList<>();
+        
+        for (Usuario u : usuarios) {
+            if (!u.getEmail().equals(usuario.getEmail())) {
+                novosUsuarios.add(u);
+            }
+        }
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO_USUARIOS))) {
+            for (Usuario u : novosUsuarios) {
+                writer.write(u.toString());
+                writer.newLine();
+            }
+        }
+        
+        String nomeArquivo = PASTA_CONTATOS + usuario.getEmail().replaceAll("[^a-zA-Z0-9]", "_") + ".txt";
+        File arquivoContatos = new File(nomeArquivo);
+        if (arquivoContatos.exists()) {
+            arquivoContatos.delete();
+        }
+    } 
+}

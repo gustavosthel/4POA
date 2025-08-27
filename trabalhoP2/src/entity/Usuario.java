@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Usuario {
@@ -7,16 +8,23 @@ public class Usuario {
 	private String nome;
 	private String email;
 	private String senha;
-	private List<Compromisso> compromissos;
+	private List<Agenda> agenda;
 	
 	public Usuario() {
 	}
 	
-	public Usuario(String nome, String email, String senha, List<Compromisso> compromissos) {
+	public Usuario(String nome, String email, String senha) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.agenda = new ArrayList<>();
+    }
+	
+	public Usuario(String nome, String email, String senha, List<Agenda> agenda) {
 		this.nome = nome;
 		this.email = email;
 		this.senha = senha;
-		this.compromissos = compromissos;
+		this.agenda = agenda;
 	}
 
 	public String getNome() {
@@ -43,21 +51,26 @@ public class Usuario {
 		this.senha = senha;
 	}
 
-	public List<Compromisso> getCompromissos() {
-		return compromissos;
+	public List<Agenda> getAgenda() {
+		return agenda;
 	}
 
-	public void setCompromissos(List<Compromisso> compromissos) {
-		this.compromissos = compromissos;
+	public void setAgenda(List<Agenda> agenda) {
+		this.agenda = agenda;
 	}
 	
-	public void adicionarCompromisso(Compromisso c) {
-        compromissos.add(c);
+	public void adicionarContato(Agenda c) {
+        agenda.add(c);
     }
+	
+	public void removerContato(Agenda c) {
+		agenda.remove(c);
+	}
+	
 	
 	@Override
 	public String toString() {
-	    return "Usuário: " + nome + " (" + email + ")";
+		return nome + ";" + email + ";" + senha;
 	}
 	
 	

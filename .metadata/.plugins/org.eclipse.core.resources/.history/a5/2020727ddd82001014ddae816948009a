@@ -1,0 +1,79 @@
+package service;
+
+import java.io.IOException;
+import java.util.List;
+
+import entity.Agenda;
+import entity.Usuario;
+
+public class UsuarioService {
+	
+	public static boolean registrarUsuario(String nome, String email, String senha) {
+        try {
+            
+            List<Usuario> usuarios = ArquivoService.carregarUsuarios();
+            for (Usuario usuario : usuarios) {
+                if (usuario.getEmail().equals(email)) {
+                    return false;
+                }
+            }
+            
+            Usuario novoUsuario = new Usuario(nome, email, senha);
+            ArquivoService.salvarUsuario(novoUsuario);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+	
+	public Usuario fazerLogin(String email, String senha) {
+        try {
+            List<Usuario> usuarios = ArquivoService.carregarUsuarios();
+            for (Usuario usuario : usuarios) {
+                if (usuario.getEmail().equals(email) && usuario.getSenha().equals(senha)) {
+                    
+                    usuario.getAgenda().addAll(ArquivoService.carregarContatos(usuario));
+                    return usuario;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+	
+	public boolean adicionarContato(Usuario usuario, String nome, String telefone) {
+        try {
+        	Agenda novoContato = new Agenda(nome, telefone);
+            usuario.adicionarContato(novoContato);
+            ArquivoService.salvarContatos(usuario);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+	
+	public boolean removerContato(Usuario usuario, Agenda contato) {
+        try {
+            usuario.removerContato(contato);
+            ArquivoService.salvarContatos(usuario);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+	
+	public boolean removerUsuario(Usuario usuario) {
+        try {
+            ArquivoService.removerUsuario(usuario);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+}

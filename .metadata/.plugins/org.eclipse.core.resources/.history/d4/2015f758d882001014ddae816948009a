@@ -1,0 +1,21 @@
+package service;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import entity.Usuario;
+
+public class ArquivoService {
+	
+	private static final String ARQUIVO_USUARIOS = "usuarios.txt";
+	
+	 public void salvarUsuario(Usuario usuario) throws IOException {
+	        try (ObjectOutputStream oos = new ObjectOutputStream(
+	            new FileOutputStream(ARQUIVO_USUARIOS, true))) {
+	            oos.writeObject(usuario);
+	        }
+	    }
+
+
+}

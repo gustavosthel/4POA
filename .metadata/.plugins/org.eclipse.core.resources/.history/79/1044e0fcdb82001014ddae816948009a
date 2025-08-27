@@ -1,0 +1,28 @@
+package service;
+
+import java.util.List;
+
+import entity.Usuario;
+
+public class UsuarioService {
+	
+	public static boolean registrarUsuario(String nome, String email, String senha) {
+        try {
+            
+            List<Usuario> usuarios = ArquivoService.carregarUsuarios();
+            for (Usuario usuario : usuarios) {
+                if (usuario.getEmail().equals(email)) {
+                    return false; // Usuário já existe
+                }
+            }
+            
+            Usuario novoUsuario = new Usuario(nome, email, senha);
+            ArquivoService.salvarUsuario(novoUsuario);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+}
